@@ -8,12 +8,34 @@
 #include <lvgl.h>
 #include <zmk/endpoints.h>
 
-#define CANVAS_SIZE 68
+#define DISP_WIDTH 68
+#define ANIM_SIZE 64
+
+#define PADDING 4
+#define BATTERY_HEIGHT 17
+#define BATTERY_IDX 0
+#define BATTERY_OFFSET 68
+
+#define WPM_HEIGHT 42
+#define WPM_IDX 1
+#define WPM_OFFSET (-BATTERY_HEIGHT + BATTERY_OFFSET - PADDING)
+
+#define BT_PROF_HEIGHT 22
+#define BT_PROF_IDX 2
+#define BT_PROF_OFFSET (-WPM_HEIGHT + WPM_OFFSET - PADDING)
+
+#define MODS_HEIGHT 42
+#define MODS_IDX 3
+#define MODS_OFFSET (-BT_PROF_HEIGHT + BT_PROF_OFFSET - PADDING)
+
+#define LAYER_HEIGHT 29
+#define LAYER_IDX 4
+#define LAYER_OFFSET (-MODS_HEIGHT + MODS_OFFSET - PADDING)
 
 #define LVGL_BACKGROUND                                                                            \
-    IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_INVERTED) ? lv_color_black() : lv_color_white()
+    IS_ENABLED(CONFIG_CUSTOM_WIDGET_INVERTED) ? lv_color_black() : lv_color_white()
 #define LVGL_FOREGROUND                                                                            \
-    IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_INVERTED) ? lv_color_white() : lv_color_black()
+    IS_ENABLED(CONFIG_CUSTOM_WIDGET_INVERTED) ? lv_color_white() : lv_color_black()
 
 struct status_state {
     uint8_t battery;
@@ -25,7 +47,8 @@ struct status_state {
     uint8_t active_profile_index;
     uint8_t layer_index;
     const char *layer_label;
-    uint8_t wpm[10];
+    uint8_t wpm;
+    uint8_t mod_state;
 #else
     bool connected;
 #endif
