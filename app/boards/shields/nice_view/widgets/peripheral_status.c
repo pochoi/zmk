@@ -23,9 +23,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/ble.h>
 
 LV_IMG_DECLARE(bongocat);
-LV_IMG_DECLARE(bongocatleft);
-LV_IMG_DECLARE(bongocatmiddle);
-LV_IMG_DECLARE(bongocatright);
+LV_IMG_DECLARE(bongocat50);
+LV_IMG_DECLARE(mountain);
+LV_IMG_DECLARE(balloon);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -123,13 +123,13 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
             lv_img_set_src(art, &bongocat);
             break;
         case 1:
-            lv_img_set_src(art, &bongocatleft);
+            lv_img_set_src(art, &bongocat50);
             break;
         case 2:
-            lv_img_set_src(art, &bongocatmiddle);
+            lv_img_set_src(art, &mountain);
             break;
         case 3:
-            lv_img_set_src(art, &bongocatright);
+            lv_img_set_src(art, &balloon);
             break;
         default:
             break;
