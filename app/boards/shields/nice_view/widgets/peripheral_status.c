@@ -23,6 +23,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/ble.h>
 
 LV_IMG_DECLARE(bongocat);
+LV_IMG_DECLARE(bongocatleft);
+LV_IMG_DECLARE(bongocatmiddle);
+LV_IMG_DECLARE(bongocatright);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -113,7 +116,25 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     lv_canvas_set_buffer(top, widget->cbuf, DISP_WIDTH, BATTERY_HEIGHT, LV_IMG_CF_TRUE_COLOR);
 
     lv_obj_t *art = lv_img_create(widget->obj);
-    lv_img_set_src(art, &bongocat);
+    uint32_t random = sys_rand32_get() % 4;  // Get a random number between 0 and 2
+
+    switch(random) {
+        case 0:
+            lv_img_set_src(art, &bongocat);
+            break;
+        case 1:
+            lv_img_set_src(art, &bongocatleft);
+            break;
+        case 2:
+            lv_img_set_src(art, &bongocatmiddle);
+            break;
+        case 3:
+            lv_img_set_src(art, &bongocatright);
+            break;
+        default:
+            break;
+    }
+
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
 
     sys_slist_append(&widgets, &widget->node);
