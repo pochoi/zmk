@@ -24,6 +24,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 LV_IMG_DECLARE(bongocat);
 LV_IMG_DECLARE(bongocat50);
+LV_IMG_DECLARE(ideapocket1);
 LV_IMG_DECLARE(mountain);
 LV_IMG_DECLARE(balloon);
 
