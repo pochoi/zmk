@@ -117,7 +117,7 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     lv_canvas_set_buffer(top, widget->cbuf, DISP_WIDTH, BATTERY_HEIGHT, LV_IMG_CF_TRUE_COLOR);
 
     lv_obj_t *art = lv_img_create(widget->obj);
-    uint32_t random = sys_rand32_get() % 4;  // Get a random number between 0 and 2
+    uint32_t random = sys_rand32_get() % 5;  // Get a random number between 0 and 2
 
     switch(random) {
         case 0:
@@ -131,6 +131,9 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
             break;
         case 3:
             lv_img_set_src(art, &balloon);
+            break;
+        case 4:
+            lv_img_set_src(art, &ideapocket1);
             break;
         default:
             break;
