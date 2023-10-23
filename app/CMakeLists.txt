@@ -8,7 +8,7 @@ list(APPEND DTS_ROOT ${CMAKE_SOURCE_DIR}/drivers/zephyr)
 set(ZephyrBuildConfiguration_ROOT ${CMAKE_SOURCE_DIR}/cmake)
 
 list(APPEND ZEPHYR_EXTRA_MODULES
-  ${CMAKE_CURRENT_SOURCE_DIR}/drivers
+  ${CMAKE_CURRENT_SOURCE_DIR}/module
 )
 
 # Find Zephyr. This also loads Zephyr's build system.
@@ -59,7 +59,7 @@ if ((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
   target_sources(app PRIVATE src/behavior_queue.c)
   target_sources(app PRIVATE src/conditional_layer.c)
   target_sources(app PRIVATE src/endpoints.c)
-  target_sources(app PRIVATE src/events/endpoint_selection_changed.c)
+  target_sources(app PRIVATE src/events/endpoint_changed.c)
   target_sources(app PRIVATE src/hid_listener.c)
   target_sources(app PRIVATE src/keymap.c)
   target_sources(app PRIVATE src/events/layer_state_changed.c)
