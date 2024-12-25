@@ -30,8 +30,7 @@ zmk_hid_indicators_t zmk_hid_indicators_get_profile(struct zmk_endpoint_instance
 static void raise_led_changed_event(struct k_work *_work) {
     const zmk_hid_indicators_t indicators = zmk_hid_indicators_get_current_profile();
 
-    ZMK_EVENT_RAISE(new_zmk_hid_indicators_changed(
-        (struct zmk_hid_indicators_changed){.indicators = indicators}));
+    raise_zmk_hid_indicators_changed((struct zmk_hid_indicators_changed){.indicators = indicators});
 
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_PERIPHERAL_HID_INDICATORS) && IS_ENABLED(CONFIG_ZMK_SPLIT_BLE)
     zmk_split_bt_update_hid_indicator(indicators);
@@ -65,5 +64,5 @@ static int profile_listener(const zmk_event_t *eh) {
     return 0;
 }
 
-static ZMK_LISTENER(profile_listener, profile_listener);
-static ZMK_SUBSCRIPTION(profile_listener, zmk_endpoint_changed);
+ZMK_LISTENER(profile_listener, profile_listener);
+ZMK_SUBSCRIPTION(profile_listener, zmk_endpoint_changed);

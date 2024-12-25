@@ -43,7 +43,7 @@ static int on_key_repeat_binding_pressed(struct zmk_behavior_binding *binding,
            sizeof(struct zmk_keycode_state_changed));
     data->current_keycode_pressed.timestamp = k_uptime_get();
 
-    ZMK_EVENT_RAISE(new_zmk_keycode_state_changed(data->current_keycode_pressed));
+    raise_zmk_keycode_state_changed(data->current_keycode_pressed);
 
     return ZMK_BEHAVIOR_OPAQUE;
 }
@@ -60,13 +60,16 @@ static int on_key_repeat_binding_released(struct zmk_behavior_binding *binding,
     data->current_keycode_pressed.timestamp = k_uptime_get();
     data->current_keycode_pressed.state = false;
 
-    ZMK_EVENT_RAISE(new_zmk_keycode_state_changed(data->current_keycode_pressed));
+    raise_zmk_keycode_state_changed(data->current_keycode_pressed);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
 static const struct behavior_driver_api behavior_key_repeat_driver_api = {
     .binding_pressed = on_key_repeat_binding_pressed,
     .binding_released = on_key_repeat_binding_released,
+#if IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
+    .get_parameter_metadata = zmk_behavior_get_empty_param_metadata,
+#endif // IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
 };
 
 static int key_repeat_keycode_state_changed_listener(const zmk_event_t *eh);
@@ -117,7 +120,7 @@ static int behavior_key_repeat_init(const struct device *dev) {
         .usage_pages_count = DT_INST_PROP_LEN(n, usage_pages),                                     \
     };                                                                                             \
     BEHAVIOR_DT_INST_DEFINE(n, behavior_key_repeat_init, NULL, &behavior_key_repeat_data_##n,      \
-                            &behavior_key_repeat_config_##n, APPLICATION,                          \
+                            &behavior_key_repeat_config_##n, POST_KERNEL,                          \
                             CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &behavior_key_repeat_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(KR_INST)

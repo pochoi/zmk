@@ -6,6 +6,8 @@
 
 #include <dt-bindings/led/led.h>
 #include <dt-bindings/zmk/matrix_transform.h>
+#include "zmk_uno-layouts.dtsi"
+
 
 &arduino_i2c {
     status = "okay";
@@ -40,10 +42,8 @@ nice_view_spi: &arduino_spi {
 
 / {
     chosen {
-        zmk,kscan = &kscan_matrix_comp;
         zmk,backlight = &backlight;
         zmk,underglow = &led_strip;
-        zmk,matrix-transform = &matrix_transform;
     };
 
     // Commented out until we add more powerful power domain support
@@ -74,7 +74,6 @@ nice_view_spi: &arduino_spi {
         map = <
         RC(0,0) RC(0,1)
         RC(1,0) RC(1,1)
-        RC(2,0) RC(2,1) RC(2,2)
         >;
     };
 
@@ -86,44 +85,12 @@ nice_view_spi: &arduino_spi {
         map = <
         RC(0,0) RC(0,1)
         RC(0,2) RC(0,3)
-        RC(1,0) RC(1,1) RC(1,2)
         >;
-    };
-
-
-    kscan_matrix_comp: kscan_matrix_comp {
-        compatible = "zmk,kscan-composite";
-        rows = <1>;
-        columns = <7>;
-
-        matrix {
-            kscan = <&kscan_matrix>;
-        };
-
-        toggle {
-            kscan = <&kscan_sp3t_toggle>;
-            row-offset = <2>;
-        };
-
-    };
-
-    kscan_direct_comp: kscan_direct_comp {
-        compatible = "zmk,kscan-composite";
-        status = "disabled";
-
-        matrix {
-            kscan = <&kscan_direct>;
-        };
-
-        toggle {
-            kscan = <&kscan_sp3t_toggle>;
-            row-offset = <1>;
-        };
-
     };
 
     kscan_matrix: kscan_matrix {
         compatible = "zmk,kscan-gpio-matrix";
+        wakeup-source;
 
         diode-direction = "col2row";
 
@@ -141,7 +108,7 @@ nice_view_spi: &arduino_spi {
 
     kscan_direct: kscan_direct {
         compatible = "zmk,kscan-gpio-direct";
-        status = "disabled";
+        wakeup-source;
 
         input-gpios
         = <&arduino_header 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
@@ -157,9 +124,9 @@ nice_view_spi: &arduino_spi {
         toggle-mode;
 
         input-gpios
-        = <&arduino_header 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-        , <&arduino_header 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-        , <&arduino_header 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+        = <&arduino_header 4 GPIO_ACTIVE_LOW>
+        , <&arduino_header 3 GPIO_ACTIVE_LOW>
+        , <&arduino_header 2 GPIO_ACTIVE_LOW>
         ;
     };
 
@@ -169,4 +136,14 @@ nice_view_spi: &arduino_spi {
         a-gpios = <&arduino_header 15 GPIO_PULL_UP>;
         b-gpios = <&arduino_header 14 GPIO_PULL_UP>;
     };
+};
+
+&matrix_physical_layout {
+    kscan = <&kscan_matrix>;
+    transform = <&matrix_transform>;
+};
+
+&direct_physical_layout {
+    kscan = <&kscan_direct>;
+    transform = <&direct_matrix_transform>;
 };

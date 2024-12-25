@@ -38,13 +38,16 @@ static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
 static const struct behavior_driver_api behavior_reset_driver_api = {
     .binding_pressed = on_keymap_binding_pressed,
     .locality = BEHAVIOR_LOCALITY_EVENT_SOURCE,
+#if IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
+    .get_parameter_metadata = zmk_behavior_get_empty_param_metadata,
+#endif // IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
 };
 
 #define RST_INST(n)                                                                                \
     static const struct behavior_reset_config behavior_reset_config_##n = {                        \
         .type = DT_INST_PROP(n, type)};                                                            \
     BEHAVIOR_DT_INST_DEFINE(n, behavior_reset_init, NULL, NULL, &behavior_reset_config_##n,        \
-                            APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,                      \
+                            POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,                      \
                             &behavior_reset_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(RST_INST)

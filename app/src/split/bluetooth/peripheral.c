@@ -18,7 +18,7 @@
 #include <zephyr/bluetooth/hci.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
-#include <zephyr/bluetooth/hci_err.h>
+#include <zephyr/bluetooth/hci_types.h>
 
 #if IS_ENABLED(CONFIG_SETTINGS)
 
@@ -83,8 +83,8 @@ K_WORK_DEFINE(advertising_work, advertising_cb);
 static void connected(struct bt_conn *conn, uint8_t err) {
     is_connected = (err == 0);
 
-    ZMK_EVENT_RAISE(new_zmk_split_peripheral_status_changed(
-        (struct zmk_split_peripheral_status_changed){.connected = is_connected}));
+    raise_zmk_split_peripheral_status_changed(
+        (struct zmk_split_peripheral_status_changed){.connected = is_connected});
 
     if (err == BT_HCI_ERR_ADV_TIMEOUT) {
         low_duty_advertising = true;
@@ -101,8 +101,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
 
     is_connected = false;
 
-    ZMK_EVENT_RAISE(new_zmk_split_peripheral_status_changed(
-        (struct zmk_split_peripheral_status_changed){.connected = is_connected}));
+    raise_zmk_split_peripheral_status_changed(
+        (struct zmk_split_peripheral_status_changed){.connected = is_connected});
 
     low_duty_advertising = false;
     k_work_submit(&advertising_work);
@@ -142,25 +142,11 @@ static struct bt_conn_auth_info_cb zmk_peripheral_ble_auth_info_cb = {
     .pairing_complete = auth_pairing_complete,
 };
 
-bool zmk_split_bt_peripheral_is_connected() { return is_connected; }
+bool zmk_split_bt_peripheral_is_connected(void) { return is_connected; }
 
-bool zmk_split_bt_peripheral_is_bonded() { return is_bonded; }
+bool zmk_split_bt_peripheral_is_bonded(void) { return is_bonded; }
 
-static int zmk_peripheral_ble_init(const struct device *_arg) {
-    int err = bt_enable(NULL);
-
-    if (err) {
-        LOG_ERR("BLUETOOTH FAILED (%d)", err);
-        return err;
-    }
-
-#if IS_ENABLED(CONFIG_SETTINGS)
-    settings_subsys_init();
-
-    settings_load_subtree("ble");
-    settings_load_subtree("bt");
-#endif
-
+static int zmk_peripheral_ble_complete_startup(void) {
 #if IS_ENABLED(CONFIG_ZMK_BLE_CLEAR_BONDS_ON_START)
     LOG_WRN("Clearing all existing BLE bond information from the keyboard");
 
@@ -171,6 +157,37 @@ static int zmk_peripheral_ble_init(const struct device *_arg) {
 
     low_duty_advertising = false;
     k_work_submit(&advertising_work);
+#endif
+
+    return 0;
+}
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+
+static int peripheral_ble_handle_set(const char *name, size_t len, settings_read_cb read_cb,
+                                     void *cb_arg) {
+    return 0;
+}
+
+static struct settings_handler ble_peripheral_settings_handler = {
+    .name = "ble_peripheral",
+    .h_set = peripheral_ble_handle_set,
+    .h_commit = zmk_peripheral_ble_complete_startup};
+
+#endif // IS_ENABLED(CONFIG_SETTINGS)
+
+static int zmk_peripheral_ble_init(void) {
+    int err = bt_enable(NULL);
+
+    if (err) {
+        LOG_ERR("BLUETOOTH FAILED (%d)", err);
+        return err;
+    }
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+    settings_register(&ble_peripheral_settings_handler);
+#else
+    zmk_peripheral_ble_complete_startup();
 #endif
 
     return 0;
